@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  email        String         @unique
+  name         String         @unique
+  password     String
+  profilePic   String?        @default("https://res.cloudinary.com/demo/image/upload/v1631234567/default_profile.png")
+  description  String         @default("**Idea Hub User**")         
+  rating       Int            @default(0)
+  posts        Post[]
+  isActive     Boolean        @default(false)
+  role         Role           @default(USER)
+  requestedRole      Role?          // Role requested during signup
+  adminRequestReason String?        // Reason for requesting admin access
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  postLikes    PostLikes[]
+  postDislikes PostDislikes[]
+}
+
+enum State {
+  Approved
+  Pending
+  Rejected
+}
+
+enum Visibility {
+  public
+  private
+}
+
+model Post {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  content     String
+  rating      Int            @default(0)
+  state       State          @default(Pending)
+  visibility  Visibility     @default(public)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  likes       PostLikes[]
+  dislikes    PostDislikes[]
+  authorid    String         @db.ObjectId
+  author      User           @relation(fields: [authorid], references: [id], onDelete: Cascade)
+}
+
+model PostLikes {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postid    String   @db.ObjectId
+  userid    String   @db.ObjectId
+  post      Post     @relation(fields: [postid], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userid], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PostDislikes {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  postid    String   @db.ObjectId
+  userid    String   @db.ObjectId
+  post      Post     @relation(fields: [postid], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userid], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
