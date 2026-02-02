@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@prisma/client": "^6.19.0",
+    "@prisma/client": "6.19.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^1.41.3",
@@ -12,7 +12,7 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^7.0.12",
     "nodemon": "^3.1.11",
-    "prisma": "^6.19.0"
+    "prisma": "6.19.0"
   },
   "scripts": {
     "dev": "nodemon src/app.js",
