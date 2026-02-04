@@ -17,6 +17,6 @@
   "scripts": {
     "dev": "nodemon src/app.js",
     "start": "node src/app.js",
-    "build": "npx prisma generate"
+    "build": "prisma generate"
   }
 }
