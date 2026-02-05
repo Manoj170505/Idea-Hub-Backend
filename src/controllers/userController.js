@@ -22,6 +22,18 @@ const handleApprove = async (req, res) => {
 
 const upateMe = async (req, res) => {
     try {
+        // Check if user is trying to change sensitive credentials
+        const sensitiveFields = ['email', 'password', 'role'];
+        const isSensitiveChange = sensitiveFields.some(field => req.body[field] !== undefined);
+
+        // If trying to change sensitive fields, require admin token
+        if (isSensitiveChange && !req.adminToken) {
+            return res.status(403).json({
+                status: "fail",
+                message: "Admin token required to change credentials (email, password, or role). Please request an admin token first."
+            });
+        }
+
         let updatedData = { ...req.body };
         if (req.file) {
             updatedData.profilePic = req.file.path;

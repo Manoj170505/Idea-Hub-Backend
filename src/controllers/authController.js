@@ -81,4 +81,55 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { signup, login };
+// --- REQUEST ADMIN TOKEN ---
+const requestAdminToken = async (req, res) => {
+    try {
+        const { password } = req.body;
+        const userId = req.user.id; // From protect middleware
+
+        if (!password) {
+            return res.status(400).json({
+                status: "fail",
+                message: "Password is required to generate admin token"
+            });
+        }
+
+        // Verify user exists and password is correct
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({
+                status: "fail",
+                message: "Invalid password"
+            });
+        }
+
+        // Verify user is an admin
+        if (user.role !== 'ADMIN') {
+            return res.status(403).json({
+                status: "fail",
+                message: "Only admins can request admin tokens"
+            });
+        }
+
+        // Generate admin token
+        const generateAdminToken = require('../utils/generateAdminToken');
+        const adminToken = generateAdminToken(userId);
+
+        res.json({
+            status: "success",
+            message: "Admin token generated successfully",
+            data: {
+                adminToken,
+                expiresIn: "15m"
+            }
+        });
+    } catch (error) {
+        res.status(400).json({
+            status: "fail",
+            message: error.message
+        });
+    }
+};
+
+module.exports = { signup, login, requestAdminToken };
