@@ -8,7 +8,9 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-    origin: '*', // Allow all origins for production
+    origin: function (origin, callback) {
+        callback(null, true);
+    },
     credentials: true
 }));
 
